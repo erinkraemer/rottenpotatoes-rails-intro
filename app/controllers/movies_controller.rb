@@ -4,10 +4,14 @@ class MoviesController < ApplicationController
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
+#     @ratings_to_show = ratings_to_show
   end
 
   def index
-    @movies = Movie.all
+    puts "in index"
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show = ratings_to_show
+    @movies = with_ratings(@ratings_to_show)
   end
 
   def new
@@ -37,7 +41,20 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-
+  
+  def with_ratings(movie_ratings)
+    Movie.where(rating: movie_ratings)
+  end
+  
+  def ratings_to_show
+#     See which ones are checked
+    # check if empty 
+    #     puts Movie.where(params[:rating].keys)
+#     Movie.where(rating: all_ratings.keys)
+    puts params[:ratings]
+    params[:ratings].nil? ? checked = @all_ratings : checked = params[:ratings].keys
+  end
+  
   private
   # Making "internal" methods private is not required, but is a common practice.
   # This helps make clear which methods respond to requests, and which ones do not.
