@@ -11,7 +11,8 @@ class MoviesController < ApplicationController
     puts "in index"
     @all_ratings = Movie.all_ratings
     @ratings_to_show = ratings_to_show
-    @movies = with_ratings(@ratings_to_show)
+    @sort = params[:sort]
+    @movies = with_ratings(@ratings_to_show).order(@sort)
   end
 
   def new
