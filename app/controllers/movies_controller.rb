@@ -6,13 +6,29 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
 #     @ratings_to_show = ratings_to_show
   end
+  
+#   # REFERENCE OLD WORKING
+#   def index
+#     puts "in index"
+#     @all_ratings = Movie.all_ratings
+#     @ratings_to_show = ratings_to_show
+#     @sort = params[:sort]
+#     @movies = with_ratings(@ratings_to_show).order(@sort)
+#   end
 
   def index
     puts "in index"
     @all_ratings = Movie.all_ratings
+    
+    puts  " inside index"
     @ratings_to_show = ratings_to_show
-    @sort = params[:sort]
+#     session[:ratings]= @ratings_to_show
+    
+#     @sort = sort_to_show
+#     session[:sort] = @sort
+    
     @movies = with_ratings(@ratings_to_show).order(@sort)
+    
   end
 
   def new
@@ -47,14 +63,54 @@ class MoviesController < ApplicationController
     Movie.where(rating: movie_ratings)
   end
   
+#   # REFERENCE
+#   def ratings_to_show
+#     puts params[:ratings]
+#     params[:ratings].nil? ? checked = @all_ratings : checked = params[:ratings].keys
+#   end
+  
+  
   def ratings_to_show
-#     See which ones are checked
-    # check if empty 
-    #     puts Movie.where(params[:rating].keys)
-#     Movie.where(rating: all_ratings.keys)
-    puts params[:ratings]
-    params[:ratings].nil? ? checked = @all_ratings : checked = params[:ratings].keys
+    # Use remembered session rating or use params rating and update session rating
+    # On page load
+    if params[:ratings].nil?
+      # Check for history
+      if session[:ratings].nil?
+        # Populate all to view all
+        @showing_ratings = @all_ratings
+      else 
+        # Set from session
+        @showing_ratings = session[:ratings]
+      end
+      
+    else
+      # Refresh (blue button): modifies url
+      # Submit refresh: modifies url 
+        @showing_ratings = params[:ratings].keys
+        
+    end
+    # Save selected ratings to session
+    session[:ratings] = @showing_ratings
+    @showing_ratings
   end
+  
+  
+  
+  def sort_to_show
+    # Use remembered session sort or use params sort and update session rating
+    #params[:sort].nil? ? sort=nil : sort = params[:sort]
+    #byebug
+    if params[:sort].nil?
+      @showing_sort = session[:sort]
+    else
+      
+        @showing_sort = params[:sort]
+       
+    end
+    session[:sort] = @showing_sort
+    @showing_sort
+  end
+ 
   
   private
   # Making "internal" methods private is not required, but is a common practice.
